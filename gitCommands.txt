@@ -1,0 +1,8 @@
+git clone "URL"
+git pull origin main
+
+git branch BRANCH_NAME
+git checkout BRANCH_NAME
+git add .
+git commit -m "Commit Message"
+git push -u origin BRANCH_NAME
