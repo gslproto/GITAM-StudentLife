@@ -6,7 +6,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require("google-auth-library");
 
 dotenv.config();
 
@@ -34,63 +34,81 @@ app.set("view engine", "ejs");
 // Connect to MongoDB
 mongoose
   .connect(
-    `mongodb+srv://${username}:${password}@studentlife.kizuxti.mongodb.net/StudentLife`,
-    { useNewUrlParser: true, useUnifiedTopology: true }
+    `mongodb+srv://${username}:${password}@studentlife.kizuxti.mongodb.net/StudentLife`
   )
-  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
 const userSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  name: { type: String, required: true },
+  pinNumber: { type: String, required: false },
   email: { type: String, required: true },
   googleId: { type: String },
 });
 
 const User = mongoose.model("User", userSchema);
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:5000/auth/google/callback" // replace with your actual URL
-  },
-  async (accessToken, refreshToken, profile, done) => {
-    try {
-      let user = await User.findOne({ googleId: profile.id });
-      if (!user) {
-        user = new User({
-          googleId: profile.id,
-          firstName: profile.name.givenName,
-          lastName: profile.name.familyName,
-          email: profile.emails[0].value,
-        });
-        await user.save();
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "http://localhost:5000/auth/google/callback", // replace with your actual URL
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({ googleId: profile.id });
+        if (!user) {
+          user = new User({
+            googleId: profile.id,
+            name: profile.name.givenName,
+            pinNumber: profile.name.familyName,
+            email: profile.emails[0].value,
+          });
+          await user.save();
+        }
+        done(null, user);
+      } catch (err) {
+        console.error(err);
+        done(err, null);
       }
-      done(null, user);
-    } catch (err) {
-      console.error(err);
-      done(err, null);
     }
-  }));
+  )
+);
+
+// Passport serialization and deserialization
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
 
 // Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/auth/status', (req, res) => {
+app.get("/auth/status", (req, res) => {
   const isAuthenticated = !!req.user;
   res.json({ isAuthenticated });
 });
 
-app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile', 'email'] })
+app.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
 );
 
-app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+app.get(
+  "/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
     req.session.user = req.user;
-    res.redirect('/');
+    res.redirect("/success");
   }
 );
 
