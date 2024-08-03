@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GITAM-Student Life</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Overlock:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      position: relative;
+    }
+
+    .left {
+      width: 70%;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .right {
+      width: 30%;
+      background-color: black;
+    }
+
+    .center-content {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      max-width: 100px;
+      height: auto;
+      filter: invert(100%) brightness(0%);
+    }
+
+    .logo-text {
+      font-family: 'Overlock', sans-serif;
+      font-weight: 900;
+      font-size: 36px;
+      margin-left: 10px;
+    }
+
+    .login-btn {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: 2px solid black;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background-color: rgb(240, 235, 235);
+    }
+
+    .additional-image {
+      position: absolute;
+      bottom: 210px;
+      left: 850px;
+      width: 300px;
+      height: auto;
+      border-top: none;
+      border-right: none;
+    }
+
+    .google-logo {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    @media (max-width: 1200px) {
+      .left {
+        width: 65%;
+      }
+
+      .right {
+        width: 35%;
+      }
+
+      .additional-image {
+        bottom: 210px;
+        left: 630px;
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .left {
+        width: 60%;
+      }
+
+      .right {
+        width: 40%;
+      }
+
+      .additional-image {
+        bottom: 210px;
+        left: 450px;
+        width: 250px;
+      }
+    }
+
+    @media (max-width: 470px) {
+      body, html {
+        background-color: black;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .left, .right {
+        background-color: black;
+        color: white;
+        width: 100%;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .logo {
+        filter: invert(100%) brightness(200%);
+      }
+
+      .logo-text {
+        color: white;
+      }
+
+      .login-btn {
+        border-color: white;
+        color: black;
+      }
+
+      .login-btn:hover {
+        background-color: rgb(50, 50, 50);
+      }
+
+      .additional-image {
+        bottom: 20px;
+        left: 110px;
+        width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <div class="center-content">
+        <div class="logo-container">
+          <img src="https://cdn.gitam.edu/images/logo/gitam-logo-circle.png" alt="Logo" class="logo">
+          <span class="logo-text">GITAM</span>
+        </div>
+        <button class="login-btn" onclick="window.location.href='/auth/google'">
+          <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+          Login with Gitam Student Mail
+        </button>
+      </div>
+    </div>
+    <img src="clubs.png" alt="Additional Image" class="additional-image">
+    <div class="right"></div>
+  </div>
+</body>
+</html>
