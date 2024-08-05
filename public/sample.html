@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        nav {
+            background-color: black;
+            color: white;
+            padding: 10px 0;
+        }
+
+        .container {
+            padding: 30px;
+            background-color: #f4f4f4;
+        }
+
+        .section {
+            background-color: #f4f4f4;
+            border: 1px solid white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .scroll-wrapper {
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+        }
+
+        .card-container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: nowrap;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 500px;
+            height: 250px;
+            flex: 0 0 auto;
+            cursor: pointer;
+            perspective: 1000px;
+            background: linear-gradient(45deg, #63f4a7, #00470a); /* Default gradient */
+            position: relative; /* For intricate designs */
+        }
+
+        .card:nth-child(1) {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+        }
+
+        .card:nth-child(2) {
+            background: linear-gradient(45deg, #a1c4fd, #c2e9fb);
+        }
+
+        .card:nth-child(3) {
+            background: linear-gradient(45deg, #fbc2eb, #a6c1ee);
+        }
+
+        .card:nth-child(4) {
+            background: linear-gradient(45deg, #ffecd2, #fcb69f);
+        }
+
+        .card:nth-child(5) {
+            background: linear-gradient(45deg, #a8edea, #fed6e3);
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(45deg, #8ff7f5, #01514b);
+            color: black;
+        }
+
+        .card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-content .info {
+            flex: 2;
+        }
+
+        .card-content .logo {
+            flex: 1;
+            text-align: center;
+        }
+
+        .card-content .logo img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .popup, .apply-form-popup {
+            display: none;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .popup-header, .apply-form-header {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .close-popup {
+            cursor: pointer;
+            float: right;
+            font-size: 1.2em;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+        }
+
+        .scroll-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .search-input-container {
+            position: relative;
+            width: 200px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 40px 10px 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .search-button {
+            position: absolute;
+            right: -40%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .apply-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .apply-form label {
+            margin-top: 10px;
+        }
+
+        .apply-form input, .apply-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        .apply-form button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .join-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .join-button i {
+            margin-right: 8px;
+        }
+
+        .card:before, .card:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .card:before {
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+        }
+
+        .card:after {
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: linear-gradient(to right, rgba(255,255,255,0.1), rgba(255,255,255,0.1)), linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.1));
+            border-radius: 50%;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <img src="image.jpg" alt="Logo" width="150px">
+        </nav>
+    </header>
+    <div class="container">
+        <h2>My Clubs</h2>
+        <div class="search-container">
+            <div class="search-input-container">
+                <input type="text" id="myClubsSearch" class="search-input" placeholder="Search My Clubs">
+                <button class="search-button" onclick="searchClubs('myClubsSearch', 'myClubs')"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="section">
+            <div class="scroll-wrapper" id="myClubs">
+                <div class="card-container">
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Repeat more card elements as needed -->
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo2.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Club Group</div>
+                                        <div>80 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('My Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about My Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>All Clubs</h2>
+        <div class="search-container">
+            <div class="search-input-container">
+                <input type="text" id="allClubsSearch" class="search-input" placeholder="Search All Clubs">
+                <button class="search-button" onclick="searchClubs('allClubsSearch', 'allClubs')"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+        <div class="section">
+            <div class="scroll-wrapper" id="allClubs">
+                <div class="card-container">
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Another Club Group</div>
+                                        <div>120 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('All Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about All Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Repeat more card elements as needed -->
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Another Club Group</div>
+                                        <div>120 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('All Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about All Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Another Club Group</div>
+                                        <div>120 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('All Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about All Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Another Club Group</div>
+                                        <div>120 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('All Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about All Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" onclick="flipCard(this)">
+                        <div class="card-inner">
+                            <div class="card-front">
+                                <div class="card-content">
+                                    <div class="info">
+                                        <div>Another Club Group</div>
+                                        <div>120 Members</div>
+                                    </div>
+                                    <div class="logo">
+                                        <img src="logo.png" alt="Logo">
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="join-button" onclick="event.stopPropagation(); showDetails('All Club 1')"><i class="fas fa-sign-in-alt"></i>Join</button>
+                                </div>
+                            </div>
+                            <div class="card-back">
+                                <div class="card-content">
+                                    <div>Details about All Club 1</div>
+                                    <button class="join-button" onclick="event.stopPropagation(); showApplyForm()">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="popup" id="detailsPopup">
+        <div class="popup-header">Club Details<span class="close-popup" onclick="closePopup()">&times;</span></div>
+        <div class="popup-content">
+            <!-- Details content will be populated dynamically -->
+        </div>
+    </div>
+
+    <div class="apply-form-popup" id="applyFormPopup">
+        <div class="apply-form-header">Apply to Club<span class="close-popup" onclick="closePopup()">&times;</span></div>
+        <div class="apply-form-content">
+            <form class="apply-form">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+
+                <button type="submit">Submit Application</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+
+        function showDetails(clubName) {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('detailsPopup').style.display = 'block';
+            document.querySelector('.popup-content').innerHTML = 'Details about ' + clubName;
+        }
+
+        function showApplyForm() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('applyFormPopup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('detailsPopup').style.display = 'none';
+            document.getElementById('applyFormPopup').style.display = 'none';
+        }
+
+        function searchClubs(inputId, sectionId) {
+            const searchTerm = document.getElementById(inputId).value.toLowerCase();
+            const section = document.getElementById(sectionId);
+            const cards = section.querySelectorAll('.card');
+
+            cards.forEach(card => {
+                const info = card.querySelector('.info').textContent.toLowerCase();
+                if (info.includes(searchTerm)) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
